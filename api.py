@@ -1,8 +1,10 @@
 import json
 import requests
+import os
 from config import OPEN5E_API_URL, DOC_KEY, PAGINATION_LIMIT, ROOT_DIR
 
-creatureURL = OPEN5E_API_URL + "creatures/"
+creatureURL = f"{OPEN5E_API_URL}creatures/"
+JSON_DIR = ROOT_DIR / "json_dump"
 
 def get_count():
     response = requests.get(creatureURL, params={"document__key__iexact": DOC_KEY, "format": "json", "limit": PAGINATION_LIMIT, "fields": "count"})
@@ -11,6 +13,7 @@ def get_count():
     return results["count"]
 
 def main():
+    JSON_DIR.mkdir(parents=True, exist_ok=True)
     count = get_count()
     pages = (count // PAGINATION_LIMIT) + (1 if count % PAGINATION_LIMIT > 0 else 0)
     for page in range(1, pages + 1):
