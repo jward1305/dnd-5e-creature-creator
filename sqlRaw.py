@@ -1,39 +1,22 @@
 import duckdb
-import re
 from config import ROOT_DIR
 
 DUCKDB_DIR = ROOT_DIR/"duckdb"/"CreatureCreator.duckdb"
 DUCKDB_DIR.parent.mkdir(parents=True, exist_ok=True)
 con = duckdb.connect(str(DUCKDB_DIR))
-CreatureQuery = f"CREATE TABLE IF NOT EXISTS CreaturesRaw AS SELECT unnest(results, max_depth := 2) FROM read_json('{ROOT_DIR}/json_dump/creatures*.json')"
-con.sql(CreatureQuery)
+
+file = ROOT_DIR/"sqlRaw.sql"
+sql = file.read_text()
+sql = sql.replace("{ROOT_DIR}", str(ROOT_DIR))
+con.execute(sql)
 con.table("CreaturesRaw").show()
-
-CreatureTypeQuery = f"CREATE TABLE IF NOT EXISTS CreatureTypesRaw AS SELECT unnest(results, max_depth := 2) FROM read_json('{ROOT_DIR}/json_dump/creaturetypes.json')"
-con.sql(CreatureTypeQuery)
-#con.table("CreatureTypesRaw").show()
-
-ConditionQuery = f"CREATE TABLE IF NOT EXISTS ConditionsRaw AS SELECT unnest(results, max_depth := 2) FROM read_json('{ROOT_DIR}/json_dump/conditions.json')"
-con.sql(ConditionQuery)
-#con.table("ConditionsRaw").show()
-
-DamageTypeQuery = f"CREATE TABLE IF NOT EXISTS DamageTypesRaw AS SELECT unnest(results, max_depth := 2) FROM read_json('{ROOT_DIR}/json_dump/damagetypes.json')"
-con.sql(DamageTypeQuery)
-#con.table("DamageTypesRaw").show()
-
-EnvironmentQuery = f"CREATE TABLE IF NOT EXISTS EnvironmentsRaw AS SELECT unnest(results, max_depth := 2) FROM read_json('{ROOT_DIR}/json_dump/environments.json')"
-con.sql(EnvironmentQuery)
-#con.table("EnvironmentsRaw").show()
-
-LanguageQuery = f"CREATE TABLE IF NOT EXISTS LanguagesRaw AS SELECT unnest(results, max_depth := 2) FROM read_json('{ROOT_DIR}/json_dump/languages.json')"
-con.sql(LanguageQuery)
-#con.table("LanguagesRaw").show()
-
-SizeQuery = f"CREATE TABLE IF NOT EXISTS SizesRaw AS SELECT unnest(results, max_depth := 2) FROM read_json('{ROOT_DIR}/json_dump/sizes.json')"
-con.sql(SizeQuery)
-#con.table("SizesRaw").show()
-
-#con.sql("SELECT type.name, count(type.name) FROM CreaturesRaw GROUP BY type.name").show()
+con.table("CreatureTypesRaw").show()
+con.table("ConditionsRaw").show()
+con.table("DamageTypesRaw").show()
+con.table("EnvironmentsRaw").show()
+con.table("LanguagesRaw").show()
+con.table("SizesRaw").show()
+con.sql("SELECT descriptions FROM ConditionsRaw").show()
 con.close()
 
 '''

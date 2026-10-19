@@ -1,4 +1,4 @@
-CREATE OR REPLACE TABLE CreaturesTyped AS
+CREATE OR REPLACE TABLE CreaturesStructured AS
 SELECT
 	key AS CreatureKey,
 	name AS CreatureName,
@@ -41,4 +41,60 @@ SELECT
 	resistances_and_immunities.damage_immunities_display AS Damage_Immunities_Display,
 	resistances_and_immunities.damage_resistances_display AS Damage_Resistances_Display,
 	resistances_and_immunities.damage_vulnerabilities_display AS Damage_Vulnerabilities_Display 
-FROM CreaturesRaw
+FROM CreaturesRaw;
+
+CREATE OR REPLACE TABLE CreatureTypesStructured AS
+SELECT
+    ct.key AS CTKey,
+    ct.name AS CTName,
+    d.desc AS CTDescription
+FROM CreatureTypesRaw AS ct
+CROSS JOIN UNNEST(ct.descriptions) AS u(d)
+WHERE d.gamesystem = '5e-2014';
+
+CREATE OR REPLACE TABLE ConditionsStructured AS
+SELECT
+	c.key AS CKey,
+	c.name AS CName,
+	d.desc AS CDescription
+FROM ConditionsRaw AS c
+CROSS JOIN UNNEST(c.descriptions) AS u(d)
+WHERE d.gamesystem = '5e-2014';
+
+CREATE OR REPLACE TABLE DamageTypesStructured AS
+SELECT
+	dt.key AS DTKey,
+	dt.name AS DTName,
+	d.desc AS DTDescription
+FROM  DamageTypesRaw AS dt
+CROSS JOIN UNNEST(dt.descriptions) AS u(d)
+WHERE d.gamesystem = '5e-2014';
+
+CREATE OR REPLACE TABLE EnvironmentsStructured AS
+SELECT
+	e.key AS EKey,
+	e.name AS EName,
+	e.desc AS EDescription,
+	e.aquatic AS isAquatic,
+	e.planar AS isPlanar,
+	e.interior AS isInterior
+FROM EnvironmentsRaw AS e;
+
+CREATE OR REPLACE TABLE LanguagesStructured AS
+SELECT
+	l.key AS LKey,
+	l.name AS LName,
+	l.desc AS LDescription,
+	l.script_language AS LScript,
+	l.is_exotic AS isExotic,
+	l.is_Secret AS isSecret
+FROM LanguagesRaw AS l;
+
+CREATE OR REPLACE TABLE SizesStructured AS
+SELECT
+	s.key AS SKey,
+	s.name AS SName,
+	s.rank as SRank,
+	s.space_diameter AS Diameter,
+	s.suggested_hit_dice AS SuggestedHitDice
+FROM SizesRaw AS s;
