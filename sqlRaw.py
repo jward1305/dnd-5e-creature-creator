@@ -116,38 +116,38 @@ TABLE Languages: #https://api.open5e.com/v2/languages/?document__gamesystem__key
     isSecret: BOOLEAN
 }
 
-TABLE Creature_Save_Proficiencies:   #derive proficiencies from saving_throws
+TABLE Creature_Save_Proficiencies:   #derive proficiencies from saving_throws. 0 = not proficient, 1 = proficient, 2 = expertise
 {
     creatureid INTEGER REFERENCES Creature(creatureid) ON DELETE CASCADE,
-    str_prof: BOOLEAN,
-    dex_prof: BOOLEAN,
-    con_prof: BOOLEAN,
-    int_prof: BOOLEAN,
-    wis_prof: BOOLEAN,
-    cha_prof: BOOLEAN,
+    str_prof: INTEGER,
+    dex_prof: INTEGER,
+    con_prof: INTEGER,
+    int_prof: INTEGER,
+    wis_prof: INTEGER,
+    cha_prof: INTEGER,
 }
 
-TABLE Creature_Skill_Proficiencies: #derive proficienciesfrom skill_bonus
+TABLE Creature_Skill_Proficiencies: #derive proficiencies from skill_bonus.  0 = not proficient, 1 = proficient, 2 = expertise
 {
     creatureid INTEGER REFERENCES Creature(creatureid) ON DELETE CASCADE,
-    acrobatics_prof: BOOLEAN, 
-    animal_handling_prof: BOOLEAN, 
-    arcana_prof: BOOLEAN, 
-    athletics_prof: BOOLEAN,
-    deception_prof: BOOLEAN, 
-    history_prof: BOOLEAN, 
-    insight_prof: BOOLEAN, 
-    intimidation_prof: BOOLEAN, 
-    investigation_prof: BOOLEAN, 
-    medicine_prof: BOOLEAN, 
-    nature_prof: BOOLEAN, 
-    perception_prof: BOOLEAN, 
-    performance_prof: BOOLEAN, 
-    persuasion_prof: BOOLEAN, 
-    religion_prof: BOOLEAN, 
-    sleight_of_hand_prof: BOOLEAN, 
-    stealth_prof: BOOLEAN, 
-    survival: BOOLEAN,
+    acrobatics_prof: INTEGER, 
+    animal_handling_prof: INTEGER, 
+    arcana_prof: INTEGER, 
+    athletics_prof: INTEGER,
+    deception_prof: INTEGER, 
+    history_prof: INTEGER, 
+    insight_prof: INTEGER, 
+    intimidation_prof: INTEGER, 
+    investigation_prof: INTEGER, 
+    medicine_prof: INTEGER, 
+    nature_prof: INTEGER, 
+    perception_prof: INTEGER, 
+    performance_prof: INTEGER, 
+    persuasion_prof: INTEGER, 
+    religion_prof: INTEGER, 
+    sleight_of_hand_prof: INTEGER, 
+    stealth_prof: INTEGER, 
+    survival: INTEGER,
 }
 
 CREATE TYPE damagerelationship AS ENUM ('resistance', 'immunity', 'vulnerability')

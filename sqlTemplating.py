@@ -9,6 +9,7 @@ file = ROOT_DIR/"ActionTraitLinking.sql"
 sql = file.read_text()
 con.execute(sql)
 con.table("Actions").show()
+con.sql("DESCRIBE Actions").show()
 con.table("Traits").show()
 
 

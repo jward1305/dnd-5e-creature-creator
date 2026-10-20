@@ -14,7 +14,7 @@ RANGE   = re.compile(r"range\s+(\d+)(?:\s*/\s*(\d+))?\s*ft", re.I)
 DICE    = re.compile(
     r"(?:(?P<avg>\d+)\s*)?\(\s*(?P<n>\d+)d(?P<d>\d+)"
     r"(?:\s*(?P<sign>[+-])\s*(?P<bonus>\d+))?\s*\)\s+"
-    r"(?P<type>[a-z]+)\s+damage(?P<tail>[^.]{0,40})", re.I)
+    r"(?P<type>[a-z]+)\s+damage(?=(?P<tail>[^.]{0,40}))", re.I)
 FLAT    = re.compile(r"(?<![\d(/])\b(?P<avg>\d+)\s+(?P<type>[a-z]+)\s+damage", re.I)
 
 def parse_attack(desc: str) -> dict:
