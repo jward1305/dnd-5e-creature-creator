@@ -6,16 +6,25 @@ DUCKDB_DIR.parent.mkdir(parents=True, exist_ok=True)
 con = duckdb.connect(str(DUCKDB_DIR))
 file = ROOT_DIR/"sqlStructure.sql"
 sql = file.read_text()
+con.execute("""
+    DROP TABLE IF EXISTS CreatureLanguages CASCADE;
+    DROP TABLE IF EXISTS CreatureEnvironments CASCADE;
+    DROP TABLE IF EXISTS CreatureConditionImmunities CASCADE;
+    DROP TABLE IF EXISTS CreatureDamageRelationships CASCADE;
+    DROP TABLE IF EXISTS CreatureSkillProficiencies CASCADE;
+    DROP TABLE IF EXISTS CreatureSaveProficiencies CASCADE;
+""")
+
 con.execute(sql)
-con.table("CreaturesStructured").show()
-con.table("CreatureTypesStructured").show()
-con.table("ConditionsStructured").show()
-con.table("DamageTypesStructured").show()
-con.table("EnvironmentsStructured").show()
-con.table("LanguagesStructured").show()
-con.table("SizesStructured").show()
+#con.table("CreaturesStructured").show()
+#con.table("CreatureTypesStructured").show()
+#con.table("ConditionsStructured").show()
+#con.table("DamageTypesStructured").show()
+#con.table("EnvironmentsStructured").show()
+#con.table("LanguagesStructured").show()
+#con.table("SizesStructured").show()
 #con.sql("SELECT CreatureName, Str, Dex, Con, Int, Wis, Cha FROM CreaturesStructured").show()
 
-
+#con.sql("DESCRIBE CreaturesStructured").show(max_rows=35)
 
 con.close()
