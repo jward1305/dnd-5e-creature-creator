@@ -8,3 +8,6 @@ DOC_KEY = "srd-2014"
 GAME_SYS_KEY = "5e-2014"
 
 ROOT_DIR = Path(__file__).resolve().parent
+DUCKDB_DIR = ROOT_DIR/"duckdb"/"CreatureCreator.duckdb"
+SQL_DIR = ROOT_DIR / "sql"
+JSON_DIR = ROOT_DIR / "json_dump"

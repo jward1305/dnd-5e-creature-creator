@@ -1,3 +1,87 @@
+----------------------------------------------------Structured Tables
+CREATE TABLE IF NOT EXISTS CreaturesStructured (
+	CreatureKey VARCHAR PRIMARY KEY,
+	CreatureName VARCHAR,
+	isCustom BOOLEAN,
+	CreatureType VARCHAR,
+	CreatureSize VARCHAR,
+	Challenge_Rating DOUBLE,
+	Proficiency_Bonus INTEGER,
+	Experience_Points INTEGER,
+	Armour_Class TINYINT,
+	Armour_Details VARCHAR,
+	Hit_Points SMALLINT,
+	Hit_Dice VARCHAR,
+	Str TINYINT,
+	Dex TINYINT,
+	Con TINYINT,
+	Int TINYINT,
+	Wis TINYINT,
+	Cha TINYINT,
+	Walk_Speed SMALLINT,
+	Fly_Speed SMALLINT,
+	Swim_Speed SMALLINT,
+	Climb_Speed SMALLINT,
+	Burrow_Speed SMALLINT,
+	Crawl_Speed SMALLINT,
+	canHover BOOLEAN,
+	Passive_Perception SMALLINT,
+	Normal_Sight_Range SMALLINT,
+	Darkvision_Range SMALLINT,
+	Blindsight_Range SMALLINT,
+	Tremorsense_Range SMALLINT,
+	True_Sight_Range SMALLINT,
+	Languages_Display VARCHAR,
+	Damage_Immunities_Display VARCHAR,
+	Damage_Resistances_Display VARCHAR,
+	Damage_Vulnerabilities_Display VARCHAR 
+);
+
+CREATE TABLE IF NOT EXISTS CreatureTypesStructured(
+	CTKey VARCHAR PRIMARY KEY,
+	CTName VARCHAR,
+	CTDescription VARCHAR
+);
+
+CREATE TABLE IF NOT EXISTS ConditionsStructured(
+	CKey VARCHAR PRIMARY KEY,
+	CName VARCHAR,
+	CDescription VARCHAR
+);
+
+CREATE TABLE IF NOT EXISTS DamageTypesStructured(
+	DTKey VARCHAR PRIMARY KEY,
+	DTName VARCHAR,
+	DTDescription VARCHAR
+);
+
+CREATE TABLE IF NOT EXISTS EnvironmentsStructured(
+	EKey VARCHAR PRIMARY KEY,
+	EName VARCHAR,
+	EDescription VARCHAR,
+	isAquatic BOOLEAN,
+	isPlanar BOOLEAN,
+	isInterior BOOLEAN
+);
+
+CREATE TABLE IF NOT EXISTS LanguagesStructured(
+	LKey VARCHAR PRIMARY KEY,
+	LName VARCHAR,
+	LDescription VARCHAR,
+	LScript VARCHAR,
+	isExotic BOOLEAN,
+	isSecret BOOLEAN
+);
+
+CREATE TABLE IF NOT EXISTS SizesStructured(
+	SKey VARCHAR PRIMARY KEY,
+	SName VARCHAR,
+	SRank INTEGER,
+	Diamter VARCHAR,
+	SuggestedHitDice VARCHAR
+);
+
+----------------------------------------------------Linking Tables
 CREATE TABLE IF NOT EXISTS CreatureLanguages(
     CreatureKey VARCHAR REFERENCES CreaturesStructured(CreatureKey),
     LKey VARCHAR REFERENCES LanguagesStructured(LKey),
@@ -64,6 +148,8 @@ CREATE TABLE IF NOT EXISTS CreatureSaveProficiencies (
     Cha_Prof TINYINT,
 );
 
+----------------------------------------------------Trait & Action Tables
+
 --Can't drop sequences due to dependencies and no built in function to restart them
 --so on a data refresh, sequence based ids will simply continue on from the last value
 CREATE SEQUENCE IF NOT EXISTS seq_traitid START 1; 
@@ -71,7 +157,8 @@ CREATE SEQUENCE IF NOT EXISTS seq_traitid START 1;
 CREATE TABLE IF NOT EXISTS TraitsFiltered(
     TraitID INTEGER PRIMARY KEY DEFAULT NEXTVAL('seq_traitid'),
     TName VARCHAR,
-    TDescription VARCHAR
+    TDescription VARCHAR,
+    UNIQUE (TName, TDescription)
 );
 
 CREATE TABLE IF NOT EXISTS CreatureTraits(

@@ -1,9 +1,7 @@
 import json
 import requests
 import os
-from config import OPEN5E_API_URL, DOC_KEY, GAME_SYS_KEY, PAGINATION_LIMIT, ROOT_DIR
-
-JSON_DIR = ROOT_DIR / "json_dump"
+from config import OPEN5E_API_URL, DOC_KEY, GAME_SYS_KEY, PAGINATION_LIMIT, JSON_DIR
 
 def get_creature_count():
     creatureURL = f"{OPEN5E_API_URL}creatures/"
@@ -18,43 +16,43 @@ def get_creatures(pages):
         response = requests.get(creatureURL, params={"document__key__iexact": DOC_KEY, "format": "json", "limit": PAGINATION_LIMIT, "page": page})
         response.raise_for_status()
         results = response.json()
-        with open(f"{ROOT_DIR}/json_dump/creatures{page}.json", "w") as f:
+        with open(f"{JSON_DIR}/creatures{page}.json", "w") as f:
             json.dump(results, f, indent=4)
         print(f"Dumped page {page} of {pages} to json_dump/creatures{page}.json")
 
 def get_sizes():
     sizeURL = f"{OPEN5E_API_URL}sizes/"
-    response = requests.get(sizeURL, params={"document__gamesystem__key__iexact": GAME_SYS_KEY, "format": "json"})
+    response = requests.get(sizeURL, params={"document__gamesystem__key__iexact": GAME_SYS_KEY, "format": "json", "limit": PAGINATION_LIMIT})
     response.raise_for_status()
     results = response.json()
-    with open(f"{ROOT_DIR}/json_dump/sizes.json", "w") as f:
+    with open(f"{JSON_DIR}/sizes.json", "w") as f:
         json.dump(results, f, indent=4)
     print(f"Dumped page 1 of 1 to json_dump/sizes.json")   
 
 def get_conditions():
     conditionsURL = f"{OPEN5E_API_URL}conditions/"
-    response = requests.get(conditionsURL, params={"document__gamesystem__key__iexact": GAME_SYS_KEY, "format": "json"})
+    response = requests.get(conditionsURL, params={"document__gamesystem__key__iexact": GAME_SYS_KEY, "format": "json", "limit": PAGINATION_LIMIT})
     response.raise_for_status()
     results = response.json()
-    with open(f"{ROOT_DIR}/json_dump/conditions.json", "w") as f:
+    with open(f"{JSON_DIR}/conditions.json", "w") as f:
         json.dump(results, f, indent=4)
     print(f"Dumped page 1 of 1 to json_dump/conditions.json")    
 
 def get_environments():
     environmentsURL = f"{OPEN5E_API_URL}environments/"
-    response = requests.get(environmentsURL, params={"document__key__in[]": ["core", DOC_KEY], "format": "json"})
+    response = requests.get(environmentsURL, params={"document__key__in[]": ["core", DOC_KEY], "format": "json", "limit": PAGINATION_LIMIT})
     response.raise_for_status()
     results = response.json()
-    with open(f"{ROOT_DIR}/json_dump/environments.json", "w") as f:
+    with open(f"{JSON_DIR}/environments.json", "w") as f:
         json.dump(results, f, indent=4)
     print(f"Dumped page 1 of 1 to json_dump/environments.json")
 
 def get_languages():
     languagesURL = f"{OPEN5E_API_URL}languages/"
-    response = requests.get(languagesURL, params={"document__key__iexact": "core", "document__gamesystem__key__iexact":  GAME_SYS_KEY, "format": "json"})
+    response = requests.get(languagesURL, params={"document__key__iexact": "core", "document__gamesystem__key__iexact":  GAME_SYS_KEY, "format": "json", "limit": PAGINATION_LIMIT})
     response.raise_for_status()
     results = response.json()
-    with open(f"{ROOT_DIR}/json_dump/languages.json", "w") as f:
+    with open(f"{JSON_DIR}/languages.json", "w") as f:
         json.dump(results, f, indent=4)
     print(f"Dumped page 1 of 1 to json_dump/languages.json")
     
@@ -66,19 +64,19 @@ def get_languages():
     '''
 def get_creature_types():
     creaturetypeURL = f"{OPEN5E_API_URL}creaturetypes/"
-    response = requests.get(creaturetypeURL, params={"format": "json"})
+    response = requests.get(creaturetypeURL, params={"format": "json", "limit": PAGINATION_LIMIT})
     response.raise_for_status()
     results = response.json()
-    with open(f"{ROOT_DIR}/json_dump/creaturetypes.json", "w") as f:
+    with open(f"{JSON_DIR}/creaturetypes.json", "w") as f:
         json.dump(results, f, indent=4)
     print(f"Dumped page 1 of 1 to json_dump/creaturetypes.json")
     
 def get_damage_types():
     damagetypeURL = f"{OPEN5E_API_URL}damagetypes/"
-    response = requests.get(damagetypeURL, params={"format": "json"})
+    response = requests.get(damagetypeURL, params={"format": "json", "limit": PAGINATION_LIMIT})
     response.raise_for_status()
     results = response.json()
-    with open(f"{ROOT_DIR}/json_dump/damagetypes.json", "w") as f:
+    with open(f"{JSON_DIR}/damagetypes.json", "w") as f:
         json.dump(results, f, indent=4)
     print(f"Dumped page 1 of 1 to json_dump/damagetypes.json")
 

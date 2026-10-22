@@ -1,7 +1,7 @@
 import re
 import math
 import duckdb
-from config import ROOT_DIR
+from config import DUCKDB_DIR
 
 NORM = str.maketrans({"–": "-", "−": "-", "—": "-"})   # unicode minus signs
 
@@ -96,8 +96,7 @@ def parse_attack(desc: str) -> dict:
                                   "conditional": False, "handedness": None, "extra": False})
     return out
 
-def main():
-    DUCKDB_DIR = ROOT_DIR/"duckdb"/"CreatureCreator.duckdb"
+def parse_all():
     DUCKDB_DIR.parent.mkdir(parents=True, exist_ok=True)
     con = duckdb.connect(str(DUCKDB_DIR))
     
@@ -171,9 +170,4 @@ def main():
                         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                     """   
     con.executemany(attack_query, parsed_attacks)
-    con.table("CreatureActions").show()
-    con.table("Attacks").show()
     con.close()
-
-if __name__ == "__main__":
-    main()
