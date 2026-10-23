@@ -31,7 +31,7 @@ reference_pages = [
 navigation = st.navigation(
     {
         "Creatures": search_page,
-        "Reference": reference_pages,
+        "Reference": reference_pages
     },
     position="top",
 )

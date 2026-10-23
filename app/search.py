@@ -44,9 +44,9 @@ def get_filter_options() -> dict[str, list[str]]:
             ORDER BY EKey
         """,
         "conditions": """
-            SELECT CKey
+            SELECT CName
             FROM ConditionsStructured
-            ORDER BY CKey
+            ORDER BY CName
         """,
         "damage_types": """
             SELECT DTKey
@@ -64,6 +64,8 @@ def get_filter_options() -> dict[str, list[str]]:
     options["environments_keys"] = [row[0] for row in environments]
     return options
 
+######Search Function
+
 def find_creatures(
     search_text: str,
     creature_types: list[str],
@@ -72,9 +74,15 @@ def find_creatures(
     environments: list[str],
     conditions: list[str],
     damage_filters: list[tuple[str, str]],
+    custom_creature_filter: str = "Include",
 ) -> list[tuple[Any, ...]]:
     predicates = ["TRUE"]
     parameters: list[Any] = []
+
+    if custom_creature_filter == "Exclude":
+        predicates.append("c.isCustom = FALSE")
+    elif custom_creature_filter == "Only":
+        predicates.append("c.isCustom = TRUE")
 
     if search_text.strip():
         predicates.append("contains(lower(c.CreatureName), lower(?))")
@@ -155,6 +163,8 @@ def find_creatures(
     """
     return query_database(query, tuple(parameters))
 
+###############Details###################
+
 def get_creature_details(creature_key: str) -> dict[str, Any] | None:
     connection = duckdb.connect(str(DUCKDB_DIR), read_only=True)
     try:
@@ -178,6 +188,98 @@ def get_creature_details(creature_key: str) -> dict[str, Any] | None:
             return None
 
         details: dict[str, Any] = {"creature": creature}
+        skill_proficiencies = connection.execute(
+            """
+            SELECT
+                Athletics_Prof, Acrobatics_Prof, SleightOfHand_Prof,
+                Stealth_Prof, Arcana_Prof, History_Prof, Investigation_Prof,
+                Nature_Prof, Religion_Prof, AnimalHandling_Prof, Insight_Prof,
+                Medicine_Prof, Perception_Prof, Survival_Prof, Deception_Prof,
+                Intimidation_Prof, Performance_Prof, Persuasion_Prof
+            FROM CreatureSkillProficiencies
+            WHERE CreatureKey = ?
+            """,
+            [creature_key],
+        ).fetchone()
+        save_proficiencies = connection.execute(
+            """
+            SELECT Str_Prof, Dex_Prof, Con_Prof, Int_Prof, Wis_Prof, Cha_Prof
+            FROM CreatureSaveProficiencies
+            WHERE CreatureKey = ?
+            """,
+            [creature_key],
+        ).fetchone()
+
+        ability_scores = {
+            "strength": creature[10],
+            "dexterity": creature[11],
+            "constitution": creature[12],
+            "intelligence": creature[13],
+            "wisdom": creature[14],
+            "charisma": creature[15],
+        }
+        skill_definitions = (
+            ("Athletics", "strength"),
+            ("Acrobatics", "dexterity"),
+            ("Sleight of Hand", "dexterity"),
+            ("Stealth", "dexterity"),
+            ("Arcana", "intelligence"),
+            ("History", "intelligence"),
+            ("Investigation", "intelligence"),
+            ("Nature", "intelligence"),
+            ("Religion", "intelligence"),
+            ("Animal Handling", "wisdom"),
+            ("Insight", "wisdom"),
+            ("Medicine", "wisdom"),
+            ("Perception", "wisdom"),
+            ("Survival", "wisdom"),
+            ("Deception", "charisma"),
+            ("Intimidation", "charisma"),
+            ("Performance", "charisma"),
+            ("Persuasion", "charisma"),
+        )
+        skill_levels = skill_proficiencies or (0,) * len(skill_definitions)
+        details["skills"] = [
+            (
+                skill_name,
+                (ability_scores[ability] - 10) // 2
+                + proficiency_level * creature[5],
+            )
+            for (skill_name, ability), proficiency_level
+            in zip(skill_definitions, skill_levels)
+            if proficiency_level is not None and proficiency_level > 0
+        ]
+
+        save_definitions = (
+            ("Strength", "strength"),
+            ("Dexterity", "dexterity"),
+            ("Constitution", "constitution"),
+            ("Intelligence", "intelligence"),
+            ("Wisdom", "wisdom"),
+            ("Charisma", "charisma"),
+        )
+        save_levels = save_proficiencies or (0,) * len(save_definitions)
+        details["saving_throws"] = [
+            (
+                ability_name,
+                (ability_scores[ability] - 10) // 2
+                + proficiency_level * creature[5],
+            )
+            for (ability_name, ability), proficiency_level
+            in zip(save_definitions, save_levels)
+            if proficiency_level is not None and proficiency_level > 0
+        ]
+
+        details["languages"] = connection.execute(
+                    """
+                    SELECT l.LName
+                    FROM CreatureLanguages AS cl
+                    JOIN LanguagesStructured AS l ON l.LKey = cl.LKey
+                    WHERE cl.CreatureKey = ?
+                    ORDER BY l.LName
+                    """,
+                    [creature_key],
+                ).fetchall()
         details["environments"] = connection.execute(
             """
             SELECT e.EName
@@ -237,6 +339,8 @@ def get_creature_details(creature_key: str) -> dict[str, Any] | None:
     finally:
         connection.close()
 
+######Render creature details
+
 def render_creature_details(details: dict[str, Any]) -> None:
     creature = details["creature"]
     (
@@ -255,7 +359,7 @@ def render_creature_details(details: dict[str, Any]) -> None:
     stat_columns = st.columns(5)
     stat_columns[0].metric("Armor Class", armour_class)
     stat_columns[1].metric("Hit Points", hit_points)
-    stat_columns[2].metric("Hit Dice", hit_dice or "—")
+    stat_columns[2].metric("Hit Dice", hit_dice or "--")
     stat_columns[3].metric("Proficiency Bonus", f"+{proficiency_bonus}")
     stat_columns[4].metric("Experience", experience_points)
     st.write(armour_details or " ")
@@ -268,6 +372,24 @@ def render_creature_details(details: dict[str, Any]) -> None:
         (strength, dexterity, constitution, intelligence, wisdom, charisma),
     ):
         column.metric(label, score)
+
+    st.subheader("Saving throws")
+    if details["saving_throws"]:
+        st.write(", ".join(
+            f"{ability} {modifier:+}"
+            for ability, modifier in details["saving_throws"]
+        ))
+    else:
+        st.write("--")
+
+    st.subheader("Skills")
+    if details["skills"]:
+        st.write(", ".join(
+            f"{skill} {modifier:+}"
+            for skill, modifier in details["skills"]
+        ))
+    else:
+        st.write("--")
 
     left, right = st.columns(2)
     with left:
@@ -282,10 +404,10 @@ def render_creature_details(details: dict[str, Any]) -> None:
                 ("Burrow", burrow_speed),
                 ("Crawl", crawl_speed),
             )
-            if value is not None
+            if value != 0
         ]
         if speeds:
-            st.write(" · ".join(f"{label} {value} ft." for label, value in speeds))
+            st.write(", ".join(f"{label} {value} ft." for label, value in speeds))
         if can_hover:
             st.write("Can hover")
     with right:
@@ -293,25 +415,41 @@ def render_creature_details(details: dict[str, Any]) -> None:
         senses = [
             (label, value)
             for label, value in (
-                ("Passive perception", passive_perception),
-                ("Normal sight", normal_sight),
+                ("Normal Sight", normal_sight),
                 ("Darkvision", darkvision),
                 ("Blindsight", blindsight),
                 ("Tremorsense", tremorsense),
                 ("Truesight", truesight),
+                ("Passive Perception", passive_perception),
             )
-            if value is not None
         ]
-        st.write(" · ".join(f"{label} {value} ft." for label, value in senses) or "—")
+        
+        sensesFull = ""
+        blind = False
+        for label, value in senses:
+            if label != "Normal Sight" and (value is not None and value != 0):
+                if label == "Blindsight" and blind:
+                    sensesFull += f"{label} {value} ft. (blind beyond this radius), "
+                elif label == "Passive Perception": 
+                    sensesFull += f"{label} {value}"
+                else:
+                    sensesFull += f"{label} {value} ft., "
+            elif label == "Normal Sight" and (value is None or value == 0):
+                blind = True
+        st.write(sensesFull or "--")
+    st.subheader("Languages")    
+    if details["languages"]:
+        st.write(", ".join(row[0] for row in details["languages"]))
+    else:
+        st.write("--")
 
-    st.subheader("Languages")
-    st.write(languages or "—")
 
     relationship_labels = {
         "immunity": "Immunities",
         "resistance": "Resistances",
         "vulnerability": "Vulnerabilities",
     }
+    
     relationship_groups = {
         relationship: [
             damage_type
@@ -331,7 +469,7 @@ def render_creature_details(details: dict[str, Any]) -> None:
             st.write(f"**Condition immunities:** {', '.join(condition_names)}")
     elif not damage_immunities and not damage_resistances and not damage_vulnerabilities:
         st.subheader("Defenses")
-        st.write("—")
+        st.write("--")
 
     if details["environments"]:
         st.subheader("Environments")
@@ -383,7 +521,6 @@ def render_creature_details(details: dict[str, Any]) -> None:
             if summary:
                 st.caption(" · ".join(summary))
 
-#def render_search_page() -> None:
 if not DUCKDB_DIR.is_file():
     st.error(f"Database not found at `{DUCKDB_DIR}`. Build the database before starting the app.")
     st.stop()
@@ -425,6 +562,10 @@ with st.sidebar:
     conditions = st.multiselect(
         "Condition immunities", options["conditions"], format_func=str.title
     )
+    custom_creature_filter = st.selectbox(
+        "Custom creatures",
+        options=("Include", "Exclude", "Only"),
+    )
     damage_filter_options: dict[str, tuple[str, str]] = {}
     for damage_type in options["damage_types"]:
         for relationship_key, relationship_label in RELATIONSHIP_CHOICES:
@@ -449,6 +590,7 @@ try:
         environments,
         conditions,
         damage_filters,
+        custom_creature_filter,
     )
 except duckdb.Error as error:
     st.error(f"Could not search creatures: {error}")
