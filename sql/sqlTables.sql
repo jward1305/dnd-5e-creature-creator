@@ -193,4 +193,5 @@ CREATE TABLE IF NOT EXISTS Attacks (
     ExtraDamageDieType VARCHAR,
     ExtraDamageBonus INTEGER,
     ExtraDamageType VARCHAR,
+    UNIQUE (CreatureActionID, AName)
 );

@@ -12,5 +12,4 @@ render_reference_page(
         FROM CreatureTypesStructured
         ORDER BY CTName
     """,
-    ["Key", "Name", "Description"]
     )

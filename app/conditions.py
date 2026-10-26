@@ -12,5 +12,4 @@ render_reference_page(
         FROM ConditionsStructured
         ORDER BY CName
     """,
-    ["Key", "Name", "Description"]
 )

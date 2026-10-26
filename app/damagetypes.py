@@ -12,5 +12,4 @@ render_reference_page(
         FROM DamageTypesStructured
         ORDER BY DTName
     """,
-    ["Key", "Name", "Description"]
 )

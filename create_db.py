@@ -26,6 +26,7 @@ def main():
     con.execute(sqlDependants)
     ap.parse_all()
     print("Database Complete.")
+    con.sql("SELECT * FROM Attacks").show()
 
 if __name__ == "__main__":
     main()

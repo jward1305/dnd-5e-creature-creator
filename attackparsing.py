@@ -100,9 +100,11 @@ def parse_all():
     DUCKDB_DIR.parent.mkdir(parents=True, exist_ok=True)
     con = duckdb.connect(str(DUCKDB_DIR))
     
+    con.execute("DELETE FROM Attacks;")
+    
     con.execute(
                 """
-                INSERT OR IGNORE INTO CreatureActions (CreatureActionID, CreatureKey, CAName, CADescription)
+                INSERT OR REPLACE INTO CreatureActions (CreatureActionID, CreatureKey, CAName, CADescription)
                 SELECT ActionID, CreatureKey, name, "desc", attacks FROM Actions
                 """
             )
@@ -168,6 +170,7 @@ def parse_all():
                             ExtraDamageBonus, ExtraDamageType
                         )
                         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                        ON CONFLICT (CreatureActionID, AName) DO NOTHING;
                     """   
     con.executemany(attack_query, parsed_attacks)
     con.close()

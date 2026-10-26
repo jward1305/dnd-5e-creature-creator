@@ -275,7 +275,7 @@ try:
         connection, "SELECT CTKey, CTName FROM CreatureTypesStructured ORDER BY CTName"
     )
     sizes = fetch_rows(
-        connection, "SELECT SKey, SName FROM SizesStructured ORDER BY SRank"
+        connection, "SELECT SKey, SName, SuggestedHitDice FROM SizesStructured ORDER BY SRank"
     )
     languages = fetch_rows(
         connection, "SELECT LKey, LName FROM LanguagesStructured ORDER BY LName"
@@ -545,9 +545,9 @@ with st.form(f"custom_creature_form_{form_version}"):
         )
     with identity_columns[2]:
         size = st.selectbox(
-            "Size",
+            "Size (Suggested Hit Die)",
             sizes,
-            format_func=lambda row: row[1],
+            format_func=lambda row: f"{row[1]} ({row[2]})",
             index=next(
                 (
                     index for index, row in enumerate(sizes)
