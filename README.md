@@ -50,7 +50,7 @@ sqlParents and sqlDependants both use `INSERT OR REPLACE` to insert data into th
 git clone https://github.com/jward1305/dnd-5e-monster-maker.git
 cd dnd-5e-monster-maker
 python -m venv .venv
-source .venv/bin/activate  #or .venv/Scripts/activate
+source .venv/bin/activate  #or run .venv/Scripts/activate.ps1 on Windows
 pip install -r requirements.txt
 
 python api.py               #extract data
