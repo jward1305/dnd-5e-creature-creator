@@ -33,7 +33,8 @@ sqlTables uses `CREATE IF NOT EXIST` for tables, only creating them on the first
 sqlParents and sqlDependants both use `INSERT OR REPLACE` to insert data into the tables. This means that new data is added, and any data that has been updated since the last API pull is replaced with the updated version. The exceptions to these are `Attacks` and `TraitsFiltered`. Since these do not have an existing field to use as the primary key and DuckDB only allows for autoincrementing of values via sequences, they both have an additional `UNIQUE` contraint to prevent duplicates. This means they use an `INSERT INTO` with an `ON CONFLICT` clause that prevents the duplicate from being added.
 
 # How to run it
-```git clone https://github.com/jward1305/dnd-5e-monster-maker.git
+```
+git clone https://github.com/jward1305/dnd-5e-monster-maker.git
 cd dnd-5e-monster-maker
 python -m venv .venv
 source .venv/bin/activate  #or .venv/Scripts/activate
