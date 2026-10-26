@@ -799,6 +799,3 @@ if submitted:
 
 if created_key := st.session_state.get("created_creature_key"):
     st.success(f"Created custom creature with key `{created_key}`.")
-    if st.button("Create another creature"):
-        del st.session_state["created_creature_key"]
-        st.rerun()

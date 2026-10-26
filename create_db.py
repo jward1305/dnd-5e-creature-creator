@@ -21,12 +21,16 @@ def main():
     sqlDependants = fileDependants.read_text()
         
     con.execute(sqlCTAS)
+    print("sqlCTAS Complete.")
     con.execute(sqlTables)
+    print("sqlTables Complete.")
     con.execute(sqlParents)
+    print("sqlParents Complete.")
     con.execute(sqlDependants)
+    print("sqlDependants Complete.")
     ap.parse_all()
+    print("Attack Parsing Complete.")
     print("Database Complete.")
-    con.sql("SELECT * FROM Attacks").show()
 
 if __name__ == "__main__":
     main()

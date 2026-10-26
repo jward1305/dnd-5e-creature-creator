@@ -1,5 +1,6 @@
 --CTAS stands for CREATE TABLE AS SELECT, allowing you to create a table already populated from a source.
---Explain more;;;;;
+--DuckDB does not allow for these tables to have constraints such as primary or foreign keys, so they
+--are mostly used to store the raw data from file.
 
 CREATE OR REPLACE TABLE CreaturesRaw AS 
 SELECT unnest(results, max_depth := 2) 

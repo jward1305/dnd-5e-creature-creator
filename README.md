@@ -18,14 +18,16 @@ One quirk worth noting was that the built in filtering on the `creaturetypes` an
 
 # How it works
 **Extract**
+
 `api.py` extracts data from the API endpoints and stores them as json files. Data is not touched.
 
 **Transform**
+
 `create_db.py` performs 5 steps to transform the data correctly.
 
- i. `sqlCTAS.sql` is run, loading the raw jsons into the database, one row per record. Each endpoint has its own table. Then, it creates 2 additional tables from the `traits` and `actions` fields of the `creatures` table. The data in these tables is still not staged.
+ i. `sqlCTAS.sql` is run, loading the raw jsons into the database, unnested into one row per entry for all files. Each endpoint has its own table. Then, it creates 2 additional tables from the `traits` and `actions` fields of the `creatures` table. The data in these tables is still only unnested.
 
- ii. `sqlTables.sql` is run, creating al other tables in the database but not populating it with data yet. Fields, data types, and relationships are explicitly defined. Data is cleaned and structured.
+ ii. `sqlTables.sql` is run, creating all other tables in the database but not populating it with data yet. Fields, data types, and relationships are explicitly defined. Data is cleaned and structured.
 
  iii. `sqlParents.sql` is run, populating any tables that have no foreign keys. Any duplicates are removed and necessary filtering is performed.
 
@@ -34,7 +36,10 @@ One quirk worth noting was that the built in filtering on the `creaturetypes` an
  v. `attackparsing.py` is run in order to populate the `CreatureActions` and `Attacks` tables. This has to be done using a python script as many attacks are missing important data fields and every attack has its damage type labelled as "Thunder" no matter what, so the app uses a script to read the description of the attacks and parses the correct information from it using pattern matching. It then uses this data to populate the tables correctly.
 
 **Streamlit**
+
 `CCHome.py` is run as a streamlit app, using the page in `search.py` as its home page. The user can navigate to other pages contained in the other python files. `database.py` contains the database querying code used by the other pages, while `reference_page.py` contains a default blueprint shared by the `creaturetypes.py`, `damagetypes.py`, and `conditions.py` pages. All of the pages perform read only operations on the database, except for `createcreature.py` which performs a number of `INSERT` operations on various tables to save the creature.
+
+**SQL Operations**
 
 sqlCTAS uses `CREATE OR REPLACE` for tables, rebuilding them every run. The largest amount of data comes from the creatures endpoints, which returns 325 results in total, so this is not particularly costly to do everytime.
 sqlTables uses `CREATE IF NOT EXIST` for tables, only creating them on the first run of a fresh application. This is done as this file does not insert any data into the tables, so it simply ensures they exist for the files that do. The only issue that would arise with this is if a table's structure is changed, as this would require a fresh run to replace the old table. The creation and population of tables is done seperately to ensure that, on a fresh run, no errors occur due to a table trying to insert data or replace a table when a foreign key it references doesn't exist yet. 
@@ -49,7 +54,7 @@ source .venv/bin/activate  #or .venv/Scripts/activate
 pip install -r requirements.txt
 
 python api.py               #extract data
-python create_db.py         #transform data
+python create_db.py         #transform data. Can take ~30 seconds to run.
 streamlit run app/CCHome.py #runs streamlitapp
 ```
 
@@ -57,6 +62,7 @@ streamlit run app/CCHome.py #runs streamlitapp
 - Allow users to create their own custom attacks, actions, and traits.
 - Automaticlly calculate creature HP based on their Hit Die and Constitution score when creating.
 - Automaticlly update trait and action descriptions to try and match the creature they are applied to.
+- Spellcasting: the amount of variations possible with the spellcasting trait means it should be a seperate feature for creating custom creatures.
 
 # Where AI helped
 AI was used in the form of VSCode's inline suggestions, which would automatically complete similar code or point out errors before runtime.

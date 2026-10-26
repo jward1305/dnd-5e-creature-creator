@@ -134,6 +134,7 @@ def find_creatures(
     )
 
     if damage_filters:
+        print(damage_filters)
         selected_damage_predicates = []
         for damage_type_key, relationship in damage_filters:
             selected_damage_predicates.append(
@@ -147,6 +148,8 @@ def find_creatures(
             + ")"
             + ")"
         )
+        #print(predicates)
+        #print(parameters)
 
     query = f"""
         SELECT
@@ -161,6 +164,7 @@ def find_creatures(
         WHERE {" AND ".join(predicates)}
         ORDER BY c.CreatureName
     """
+    #print(query)
     return query_database(query, tuple(parameters))
 
 ###############Details###################
@@ -571,7 +575,7 @@ with st.sidebar:
         for relationship_key, relationship_label in RELATIONSHIP_CHOICES:
             damage_filter_options[
                 f"{damage_type.capitalize()} - {relationship_label}"
-            ] = (damage_type.capitalize(), relationship_key)
+            ] = (damage_type, relationship_key)
     selected_damage_filters = st.multiselect(
         "Damage type / relationship",
         options=list(damage_filter_options),
