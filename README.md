@@ -1,4 +1,4 @@
-# dnd-5e-monster-maker
+# dnd-5e-creature-creator
 
 # What I built and who it's for
 A tool for Dungeon Masters running Dungeons and Dragon's 5th Edition 2014 rules to find creatures, view their stats and abilities, and easily make custom monsters either from scratch or using other creatures as a base.
