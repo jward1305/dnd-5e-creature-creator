@@ -42,7 +42,9 @@ One quirk worth noting was that the built in filtering on the `creaturetypes` an
 **SQL Operations**
 
 sqlCTAS uses `CREATE OR REPLACE` for tables, rebuilding them every run. The largest amount of data comes from the creatures endpoints, which returns 325 results in total, so this is not particularly costly to do everytime.
+
 sqlTables uses `CREATE IF NOT EXIST` for tables, only creating them on the first run of a fresh application. This is done as this file does not insert any data into the tables, so it simply ensures they exist for the files that do. The only issue that would arise with this is if a table's structure is changed, as this would require a fresh run to replace the old table. The creation and population of tables is done seperately to ensure that, on a fresh run, no errors occur due to a table trying to insert data or replace a table when a foreign key it references doesn't exist yet. 
+
 sqlParents and sqlDependants both use `INSERT OR REPLACE` to insert data into the tables. This means that new data is added, and any data that has been updated since the last API pull is replaced with the updated version. The exceptions to these are `Attacks` and `TraitsFiltered`. Since these do not have an existing field to use as the primary key and DuckDB only allows for autoincrementing of values via sequences, they both have an additional `UNIQUE` contraint to prevent duplicates. This means they use an `INSERT INTO` with an `ON CONFLICT` clause that prevents the duplicate from being added.
 
 # How to run it
